@@ -36,10 +36,6 @@ go build -o cmvp-cli .
 
 Pulls from [NIST-CMVP-API](https://github.com/ethanolivertroy/NIST-CMVP-API) which mirrors NIST CMVP data.
 
-- Active modules (~1,100)
-- Historical modules (~4,000)
-- Modules in process (~260)
-
 ## License
 
 MIT
