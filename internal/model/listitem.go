@@ -20,19 +20,12 @@ func (m ModuleItem) Description() string {
 	return fmt.Sprintf("%s | %s | %s", m.VendorName, m.ModuleType, m.Status.String())
 }
 
-// FilterValue returns the string used for fuzzy filtering
-// Combines multiple fields for comprehensive search
+// FilterValue returns the string used for filtering
+// Includes only key searchable fields for accurate substring matching
 func (m ModuleItem) FilterValue() string {
-	fields := []string{
+	return strings.Join([]string{
+		m.CertificateNumber,
 		m.ModuleName,
 		m.VendorName,
-		m.CertificateNumber,
-		m.ModuleType,
-		m.Standard,
-		m.Lab,
-		m.Module.Description, // Access embedded field explicitly (not the Description() method)
-	}
-	// Add algorithms to searchable fields
-	fields = append(fields, m.Algorithms...)
-	return strings.Join(fields, " ")
+	}, " ")
 }

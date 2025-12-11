@@ -105,9 +105,10 @@ func (c *Client) fetchModules(endpoint string, status model.ModuleStatus) ([]mod
 			Caveat:            jm.Caveat,
 			Embodiment:        jm.Embodiment,
 			Description:       jm.Description,
-			Lab:               jm.Lab,
-			Algorithms:        jm.Algorithms,
-			SecurityPolicyURL: jm.SecurityPolicyURL,
+			Lab:                jm.Lab,
+			Algorithms:         jm.Algorithms,
+			AlgorithmsDetailed: jm.AlgorithmsDetailed,
+			SecurityPolicyURL:  jm.SecurityPolicyURL,
 		}
 	}
 	return modules, nil

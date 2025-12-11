@@ -41,7 +41,8 @@ type Module struct {
 	Caveat            string
 	Embodiment        string
 	Description       string
-	Lab               string
-	Algorithms        []string
-	SecurityPolicyURL string
+	Lab                string
+	Algorithms         []string
+	AlgorithmsDetailed []string
+	SecurityPolicyURL  string
 }

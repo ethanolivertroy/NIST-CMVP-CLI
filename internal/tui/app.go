@@ -32,16 +32,17 @@ type ErrorMsg struct {
 
 // Model is the main application model
 type Model struct {
-	list           list.Model
-	allModules     []list.Item
-	spinner        spinner.Model
-	loading        bool
-	err            error
-	width          int
-	height         int
-	view           ViewState
-	selectedModule *model.ModuleItem
-	apiClient      *api.Client
+	list            list.Model
+	allModules      []list.Item
+	spinner         spinner.Model
+	loading         bool
+	err             error
+	width           int
+	height          int
+	view            ViewState
+	selectedModule  *model.ModuleItem
+	apiClient       *api.Client
+	showAlgoDetails bool // Toggle between algorithm categories and detailed list
 }
 
 // NewModel creates a new application model
@@ -110,6 +111,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.view = ViewList
 				return m, nil
 			}
+		case "d":
+			if m.view == ViewDetail {
+				m.showAlgoDetails = !m.showAlgoDetails
+				return m, nil
+			}
 		}
 
 	case tea.WindowSizeMsg:
@@ -139,6 +145,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.list.Styles.Title = TitleStyle
 		m.list.FilterInput.Prompt = "Filter: "
 		m.list.FilterInput.PromptStyle = lipgloss.NewStyle().Foreground(PrimaryColor)
+
+		// Use exact substring matching instead of fuzzy matching
+		m.list.Filter = func(term string, targets []string) []list.Rank {
+			var ranks []list.Rank
+			term = strings.ToLower(term)
+			for i, target := range targets {
+				if strings.Contains(strings.ToLower(target), term) {
+					ranks = append(ranks, list.Rank{Index: i})
+				}
+			}
+			return ranks
+		}
 
 		return m, nil
 
@@ -280,8 +298,17 @@ func (m Model) renderDetailView() string {
 		b.WriteString("\n")
 	}
 
-	// Algorithms (if available)
-	if len(mod.Algorithms) > 0 {
+	// Algorithms (toggle between categories and detailed view)
+	if m.showAlgoDetails && len(mod.AlgorithmsDetailed) > 0 {
+		b.WriteString("\n")
+		b.WriteString(DetailLabelStyle.Render("Algorithms (Detailed):"))
+		b.WriteString("\n")
+		for _, algo := range mod.AlgorithmsDetailed {
+			b.WriteString("  • ")
+			b.WriteString(DetailValueStyle.Render(algo))
+			b.WriteString("\n")
+		}
+	} else if len(mod.Algorithms) > 0 {
 		b.WriteString("\n")
 		b.WriteString(DetailLabelStyle.Render("Algorithms:"))
 		b.WriteString("\n")
@@ -292,7 +319,7 @@ func (m Model) renderDetailView() string {
 	}
 
 	b.WriteString("\n")
-	b.WriteString(HelpStyle.Render("Press ESC or Backspace to return to list"))
+	b.WriteString(HelpStyle.Render("Press ESC or Backspace to return to list • Press d to toggle algorithm details"))
 
 	return AppStyle.Render(b.String())
 }

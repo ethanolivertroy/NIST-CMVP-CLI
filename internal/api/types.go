@@ -20,6 +20,7 @@ type ModuleJSON struct {
 	Description        string   `json:"description"`
 	Lab                string   `json:"lab"`
 	Algorithms         []string `json:"algorithms"`
+	AlgorithmsDetailed []string `json:"algorithms_detailed"`
 	SecurityPolicyURL  string   `json:"security_policy_url"`
 	CertificateDetailURL string `json:"certificate_detail_url"`
 }
