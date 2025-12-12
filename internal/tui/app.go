@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/ethanolivertroy/nist-cmvp-cli/internal/api"
@@ -32,17 +33,19 @@ type ErrorMsg struct {
 
 // Model is the main application model
 type Model struct {
-	list            list.Model
-	allModules      []list.Item
-	spinner         spinner.Model
-	loading         bool
-	err             error
-	width           int
-	height          int
-	view            ViewState
-	selectedModule  *model.ModuleItem
-	apiClient       *api.Client
-	showAlgoDetails bool // Toggle between algorithm categories and detailed list
+	list              list.Model
+	allModules        []list.Item
+	spinner           spinner.Model
+	loading           bool
+	err               error
+	width             int
+	height            int
+	view              ViewState
+	selectedModule    *model.ModuleItem
+	apiClient         *api.Client
+	showAlgoDetails   bool           // Toggle between algorithm categories and detailed list
+	algoViewport      viewport.Model // Viewport for scrolling detailed algorithms
+	algoViewportReady bool           // Whether viewport is initialized
 }
 
 // NewModel creates a new application model
@@ -103,6 +106,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if item, ok := m.list.SelectedItem().(model.ModuleItem); ok {
 					m.selectedModule = &item
 					m.view = ViewDetail
+					m.showAlgoDetails = false    // Reset to category view
+					m.algoViewportReady = false  // Reset viewport
 					return m, nil
 				}
 			}
@@ -114,7 +119,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "d":
 			if m.view == ViewDetail {
 				m.showAlgoDetails = !m.showAlgoDetails
+				if m.showAlgoDetails && m.selectedModule != nil {
+					// Initialize viewport with algorithm content
+					content := buildAlgorithmContent(m.selectedModule.AlgorithmsDetailed)
+					m.algoViewport = viewport.New(m.width-8, 15)
+					m.algoViewport.SetContent(content)
+					m.algoViewportReady = true
+				}
 				return m, nil
+			}
+		case "j", "k", "up", "down":
+			// Pass scroll keys to viewport when showing detailed algorithms
+			if m.view == ViewDetail && m.showAlgoDetails && m.algoViewportReady {
+				var cmd tea.Cmd
+				m.algoViewport, cmd = m.algoViewport.Update(msg)
+				return m, cmd
 			}
 		}
 
@@ -303,13 +322,10 @@ func (m Model) renderDetailView() string {
 		b.WriteString("\n")
 		b.WriteString(DetailLabelStyle.Render("Algorithms (Detailed):"))
 		b.WriteString("\n")
-		if len(mod.AlgorithmsDetailed) > 0 {
-			for _, algo := range mod.AlgorithmsDetailed {
-				b.WriteString("  • ")
-				b.WriteString(DetailValueStyle.Render(algo))
-				b.WriteString("\n")
-			}
-		} else {
+		if len(mod.AlgorithmsDetailed) > 0 && m.algoViewportReady {
+			b.WriteString(m.algoViewport.View())
+			b.WriteString(fmt.Sprintf("\n  %d algorithms (scroll with j/k or arrows)\n", len(mod.AlgorithmsDetailed)))
+		} else if len(mod.AlgorithmsDetailed) == 0 {
 			b.WriteString(HelpStyle.Render("  (No detailed algorithm data available yet)"))
 			b.WriteString("\n")
 		}
@@ -327,4 +343,15 @@ func (m Model) renderDetailView() string {
 	b.WriteString(HelpStyle.Render("Press ESC or Backspace to return to list • Press d to toggle algorithm details"))
 
 	return AppStyle.Render(b.String())
+}
+
+// buildAlgorithmContent creates the content string for the algorithm viewport
+func buildAlgorithmContent(algorithms []string) string {
+	var b strings.Builder
+	for _, algo := range algorithms {
+		b.WriteString("  • ")
+		b.WriteString(algo)
+		b.WriteString("\n")
+	}
+	return b.String()
 }
