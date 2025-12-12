@@ -13,7 +13,13 @@ https://github.com/user-attachments/assets/382222d7-1a74-45c2-83b5-847b534f2c6a
 
 ## Install
 
-### Download Binary (Recommended)
+### Homebrew (macOS/Linux)
+
+```bash
+brew install ethanolivertroy/tap/cmvp
+```
+
+### Download Binary
 
 Download the latest release for your platform:
 
@@ -63,7 +69,7 @@ go build -o cmvp .
 ## Usage
 
 ```bash
-./cmvp-cli
+cmvp
 ```
 
 ## Keys
