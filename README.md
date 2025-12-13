@@ -16,7 +16,7 @@ https://github.com/user-attachments/assets/382222d7-1a74-45c2-83b5-847b534f2c6a
 ### Homebrew (macOS/Linux)
 
 ```bash
-brew install ethanolivertroy/tap/cmvp
+brew install ethanolivertroy/sectools/cmvp
 ```
 
 ### Download Binary
