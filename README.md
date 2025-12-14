@@ -13,7 +13,7 @@ https://github.com/user-attachments/assets/382222d7-1a74-45c2-83b5-847b534f2c6a
 
 
 
-## Install
+## Installation
 
 ### Homebrew (macOS/Linux)
 
@@ -21,38 +21,26 @@ https://github.com/user-attachments/assets/382222d7-1a74-45c2-83b5-847b534f2c6a
 brew install ethanolivertroy/sectools/cmvp
 ```
 
+### Scoop (Windows)
+
+```powershell
+scoop bucket add sectools https://github.com/ethanolivertroy/scoop-sectools
+scoop install cmvp
+```
+
 ### Download Binary
 
-Download the latest release for your platform:
+Download from [Releases](https://github.com/ethanolivertroy/cmvp-tui/releases):
 
-**macOS (Apple Silicon)**
-```bash
-curl -L https://github.com/ethanolivertroy/cmvp-tui/releases/latest/download/cmvp-darwin-arm64 -o cmvp
-chmod +x cmvp
-xattr -d com.apple.quarantine cmvp  # Remove macOS quarantine flag
-sudo mv cmvp /usr/local/bin/
-```
+| Platform | Binary |
+|----------|--------|
+| macOS (Apple Silicon) | `cmvp-darwin-arm64` |
+| macOS (Intel) | `cmvp-darwin-amd64` |
+| Linux (x64) | `cmvp-linux-amd64` |
+| Linux (ARM64) | `cmvp-linux-arm64` |
+| Windows (x64) | `cmvp-windows-amd64.exe` |
 
-**macOS (Intel)**
-```bash
-curl -L https://github.com/ethanolivertroy/cmvp-tui/releases/latest/download/cmvp-darwin-amd64 -o cmvp
-chmod +x cmvp
-xattr -d com.apple.quarantine cmvp  # Remove macOS quarantine flag
-sudo mv cmvp /usr/local/bin/
-```
-
-> **Note:** The `xattr` command removes the quarantine attribute that macOS adds to downloaded files. Without it, Gatekeeper will block the unsigned binary.
-
-**Linux (AMD64)**
-```bash
-curl -L https://github.com/ethanolivertroy/cmvp-tui/releases/latest/download/cmvp-linux-amd64 -o cmvp
-chmod +x cmvp
-sudo mv cmvp /usr/local/bin/
-```
-
-**Windows**
-
-Download `cmvp-windows-amd64.exe` from the [releases page](https://github.com/ethanolivertroy/cmvp-tui/releases).
+> **Note (macOS):** Remove the quarantine attribute before running: `xattr -d com.apple.quarantine cmvp`
 
 ### Go Install
 
