@@ -11,6 +11,7 @@ builds:
     goos:
       - darwin
       - linux
+      - windows
     goarch:
       - amd64
       - arm64
@@ -21,6 +22,16 @@ archives:
 
 checksum:
   name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - Merge pull request
+      - Merge branch
 
 release:
   github:
@@ -40,3 +51,13 @@ brews:
       bin.install "cmvp"
     test: |
       assert_match "CMVP", shell_output("#{bin}/cmvp --help 2>&1", 1)
+
+scoops:
+  - repository:
+      owner: ethanolivertroy
+      name: scoop-sectools
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: bucket
+    homepage: "https://github.com/ethanolivertroy/cmvp-tui"
+    description: "Terminal UI for searching NIST CMVP validated cryptographic modules"
+    license: "MIT"
