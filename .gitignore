@@ -1,5 +1,7 @@
 # Binary
+cmvp-tui
 cmvp-cli
+cmvp
 *.exe
 
 # IDE

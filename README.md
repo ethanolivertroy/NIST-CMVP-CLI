@@ -4,14 +4,7 @@ Terminal UI for searching NIST Cryptographic Module Validation Program (CMVP) va
 
 > **Disclaimer:** This project is not affiliated with, endorsed by, or officially connected to NIST (National Institute of Standards and Technology). It is an independent tool that consumes publicly available CMVP data.
 
-
-
-https://github.com/user-attachments/assets/382222d7-1a74-45c2-83b5-847b534f2c6a
-
-
-
-
-
+![cmvp-tui demo](demo.gif)
 
 ## Installation
 
