@@ -11,3 +11,8 @@ cmvp
 
 # OS
 .DS_Store
+
+# Test/Build artifacts
+coverage.out
+*.test
+*.out
