@@ -65,3 +65,9 @@ scoops:
     homepage: "https://github.com/ethanolivertroy/cmvp-tui"
     description: "Terminal UI for searching NIST CMVP validated cryptographic modules"
     license: "MIT"
+
+msi:
+  - id: windows-installer
+    wxs: ./windows/app.wxs
+    ids:
+      - default

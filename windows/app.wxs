@@ -1,0 +1,32 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="{{.ProjectName}} {{.Version}}"
+    UpgradeCode="A1B2C3D4-1234-5678-9ABC-DEF012345678"
+    Language="1033"
+    Codepage="1252"
+    Version="{{.Version}}"
+    Manufacturer="ethanolivertroy"
+    InstallerVersion="200">
+
+    <SummaryInformation
+      Keywords="Installer"
+      Description="{{.ProjectName}} - Terminal UI for NIST CMVP"
+      Manufacturer="ethanolivertroy" />
+
+    <Media Id="1" Cabinet="cmvp.cab" EmbedCab="yes" DiskPrompt="CD-ROM #1" />
+
+    <Property Id="DiskPrompt" Value="{{.ProjectName}} {{.Version}} Installation [1]" />
+
+    <Feature Id="Complete" Level="1">
+      <ComponentRef Id="MainExecutable" />
+    </Feature>
+
+    <StandardDirectory Id='ProgramFiles{{ if eq .Arch "amd64" }}64{{ end }}Folder'>
+      <Directory Id="CMVP" Name="{{.ProjectName}}">
+        <Component Id="MainExecutable" Guid="B2C3D4E5-2345-6789-ABCD-EF0123456789">
+          <File Id="cmvpexe" Name="{{.Binary}}.exe" DiskId="1" Source="{{.Binary}}.exe" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+  </Package>
+</Wix>
