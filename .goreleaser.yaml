@@ -7,7 +7,7 @@ builds:
     env:
       - CGO_ENABLED=0
     ldflags:
-      - -s -w
+      - -s -w -X main.version={{.Version}}
     goos:
       - darwin
       - linux
@@ -54,7 +54,7 @@ brews:
     install: |
       bin.install "cmvp"
     test: |
-      assert_match "CMVP", shell_output("#{bin}/cmvp --help 2>&1", 1)
+      assert_match version.to_s, shell_output("#{bin}/cmvp --version")
 
 scoops:
   - repository:

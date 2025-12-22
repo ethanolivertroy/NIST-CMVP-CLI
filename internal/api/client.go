@@ -3,11 +3,14 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
 	"github.com/ethanolivertroy/cmvp-tui/internal/model"
 )
+
+const maxResponseSize = 10 * 1024 * 1024 // 10MB limit for API responses
 
 const (
 	BaseURL            = "https://ethanolivertroy.github.io/NIST-CMVP-API/api"
@@ -67,8 +70,13 @@ func (c *Client) FetchMetadata() (*MetadataJSON, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API returned status %d for metadata", resp.StatusCode)
+	}
+
+	body := io.LimitReader(resp.Body, maxResponseSize)
 	var metadata MetadataJSON
-	if err := json.NewDecoder(resp.Body).Decode(&metadata); err != nil {
+	if err := json.NewDecoder(body).Decode(&metadata); err != nil {
 		return nil, err
 	}
 
@@ -82,8 +90,13 @@ func (c *Client) fetchModules(endpoint string, status model.ModuleStatus) ([]mod
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API returned status %d for %s", resp.StatusCode, endpoint)
+	}
+
+	body := io.LimitReader(resp.Body, maxResponseSize)
 	var response ModulesResponse
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+	if err := json.NewDecoder(body).Decode(&response); err != nil {
 		return nil, err
 	}
 
@@ -99,12 +112,12 @@ func (c *Client) fetchModules(endpoint string, status model.ModuleStatus) ([]mod
 			Status:            status,
 
 			// Extended fields
-			Standard:          jm.Standard,
-			OverallLevel:      parseOverallLevel(jm.OverallLevel),
-			SunsetDate:        jm.SunsetDate,
-			Caveat:            jm.Caveat,
-			Embodiment:        jm.Embodiment,
-			Description:       jm.Description,
+			Standard:           jm.Standard,
+			OverallLevel:       parseOverallLevel(jm.OverallLevel),
+			SunsetDate:         jm.SunsetDate,
+			Caveat:             jm.Caveat,
+			Embodiment:         jm.Embodiment,
+			Description:        jm.Description,
 			Lab:                jm.Lab,
 			Algorithms:         jm.Algorithms,
 			AlgorithmsDetailed: jm.AlgorithmsDetailed,
@@ -121,8 +134,13 @@ func (c *Client) fetchInProcessModules() ([]model.Module, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API returned status %d for in-process modules", resp.StatusCode)
+	}
+
+	body := io.LimitReader(resp.Body, maxResponseSize)
 	var response InProcessModulesResponse
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+	if err := json.NewDecoder(body).Decode(&response); err != nil {
 		return nil, err
 	}
 

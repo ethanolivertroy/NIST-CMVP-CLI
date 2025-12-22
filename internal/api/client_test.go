@@ -200,6 +200,121 @@ func TestParseDate(t *testing.T) {
 	}
 }
 
+func TestClient_FetchMetadata_Error(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		wantErr    string
+	}{
+		{
+			name:       "404 error",
+			statusCode: http.StatusNotFound,
+			wantErr:    "API returned status 404 for metadata",
+		},
+		{
+			name:       "500 error",
+			statusCode: http.StatusInternalServerError,
+			wantErr:    "API returned status 500 for metadata",
+		},
+		{
+			name:       "429 rate limit",
+			statusCode: http.StatusTooManyRequests,
+			wantErr:    "API returned status 429 for metadata",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				http.Error(w, "Error", tt.statusCode)
+			}))
+			defer server.Close()
+
+			client := &Client{
+				httpClient: &http.Client{Timeout: 5 * time.Second},
+				baseURL:    server.URL + "/api",
+			}
+
+			_, err := client.FetchMetadata()
+			if err == nil {
+				t.Fatal("expected error, got nil")
+			}
+			if err.Error() != tt.wantErr {
+				t.Errorf("error = %q, want %q", err.Error(), tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestClient_FetchAllModules_StatusErrors(t *testing.T) {
+	tests := []struct {
+		name        string
+		failOn      string
+		wantErrPart string
+	}{
+		{
+			name:        "modules endpoint fails",
+			failOn:      "/api/modules.json",
+			wantErrPart: "fetching active modules",
+		},
+		{
+			name:        "historical endpoint fails",
+			failOn:      "/api/historical-modules.json",
+			wantErrPart: "fetching historical modules",
+		},
+		{
+			name:        "in-process endpoint fails",
+			failOn:      "/api/modules-in-process.json",
+			wantErrPart: "fetching in-process modules",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == tt.failOn {
+					http.Error(w, "Error", http.StatusInternalServerError)
+					return
+				}
+				// Return empty valid responses for other endpoints
+				w.Header().Set("Content-Type", "application/json")
+				if r.URL.Path == "/api/modules-in-process.json" {
+					json.NewEncoder(w).Encode(InProcessModulesResponse{})
+				} else {
+					json.NewEncoder(w).Encode(ModulesResponse{})
+				}
+			}))
+			defer server.Close()
+
+			client := &Client{
+				httpClient: &http.Client{Timeout: 5 * time.Second},
+				baseURL:    server.URL + "/api",
+			}
+
+			_, err := client.FetchAllModules()
+			if err == nil {
+				t.Fatal("expected error, got nil")
+			}
+			if !containsString(err.Error(), tt.wantErrPart) {
+				t.Errorf("error = %q, want to contain %q", err.Error(), tt.wantErrPart)
+			}
+		})
+	}
+}
+
+func containsString(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsSubstring(s, substr))
+}
+
+func containsSubstring(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}
+
 func TestParseOverallLevel(t *testing.T) {
 	tests := []struct {
 		name  string

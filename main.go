@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -8,7 +9,19 @@ import (
 	"github.com/ethanolivertroy/cmvp-tui/internal/tui"
 )
 
+// Version is set at build time via ldflags
+var version = "dev"
+
 func main() {
+	showVersion := flag.Bool("version", false, "Print version and exit")
+	flag.BoolVar(showVersion, "v", false, "Print version and exit (shorthand)")
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("cmvp %s\n", version)
+		return
+	}
+
 	p := tea.NewProgram(
 		tui.NewModel(),
 		tea.WithAltScreen(),
