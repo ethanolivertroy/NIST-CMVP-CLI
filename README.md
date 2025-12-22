@@ -1,5 +1,12 @@
 # cmvp-tui
 
+![Go Version](https://img.shields.io/badge/go-1.25.5-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![CI](https://github.com/ethanolivertroy/cmvp-tui/workflows/CI/badge.svg)
+![Codecov](https://codecov.io/gh/ethanolivertroy/cmvp-tui/branch/main/graph/badge.svg)
+![GitHub release](https://img.shields.io/github/v/release/ethanolivertroy/cmvp-tui)
+![Go Report Card](https://goreportcard.com/badge/github.com/ethanolivertroy/cmvp-tui)
+
 Terminal UI for searching NIST Cryptographic Module Validation Program (CMVP) validated modules.
 
 > **Disclaimer:** This project is not affiliated with, endorsed by, or officially connected to NIST (National Institute of Standards and Technology). It is an independent tool that consumes publicly available CMVP data.
@@ -72,4 +79,4 @@ Pulls from [NIST-CMVP-API](https://github.com/ethanolivertroy/NIST-CMVP-API) whi
 
 ## License
 
-MIT
+[MIT](LICENSE)
